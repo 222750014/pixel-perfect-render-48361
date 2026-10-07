@@ -14,7 +14,121 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analyses: {
+        Row: {
+          created_at: string
+          id: string
+          insights: Json | null
+          source: string
+          source_ref: string | null
+          stats: Json
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          insights?: Json | null
+          source: string
+          source_ref?: string | null
+          stats?: Json
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          insights?: Json | null
+          source?: string
+          source_ref?: string | null
+          stats?: Json
+          title?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          analysis_id: string
+          content: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          analysis_id: string
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          analysis_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          analysis_id: string
+          author: string | null
+          compound: number
+          emojis: string[]
+          id: string
+          label: string
+          like_count: number | null
+          neg: number
+          neu: number
+          pos: number
+          published_at: string | null
+          text: string
+        }
+        Insert: {
+          analysis_id: string
+          author?: string | null
+          compound: number
+          emojis?: string[]
+          id?: string
+          label: string
+          like_count?: number | null
+          neg: number
+          neu: number
+          pos: number
+          published_at?: string | null
+          text: string
+        }
+        Update: {
+          analysis_id?: string
+          author?: string | null
+          compound?: number
+          emojis?: string[]
+          id?: string
+          label?: string
+          like_count?: number | null
+          neg?: number
+          neu?: number
+          pos?: number
+          published_at?: string | null
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
