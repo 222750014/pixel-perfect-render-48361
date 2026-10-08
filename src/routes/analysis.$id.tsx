@@ -192,7 +192,7 @@ function AnalysisPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart><Pie data={insights.emotions} dataKey="share" nameKey="emotion" outerRadius={90} label={({ name }) => name as string}>
-                    {insights.emotions.map((_, i) => <Cell key={i} fill={EMO_COLORS[i % EMO_COLORS.length]} />)}</Pie><Tooltip /></PieChart>
+                    {insights.emotions.map((_, i) => <Cell key={i} fill={EMO_COLORS[i % EMO_COLORS.length] ?? "gray"} />)}</Pie><Tooltip /></PieChart>
                 </ResponsiveContainer>
                 <div className="text-sm"><p className="font-medium">Dominant emotion: {insights.dominantEmotion}</p><p className="mt-2 text-muted-foreground">{insights.emojiInterpretation}</p></div>
               </div>
@@ -224,7 +224,7 @@ function AnalysisPage() {
   );
 }
 
-function Stat({ label, value, sub, tone }: { label: string; value: string | number; sub?: string; tone?: string }) {
+function Stat({ label, value, sub, tone }: { label: string; value: string | number; sub?: string | undefined; tone?: string }) {
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{tone && <span className={`h-2 w-2 rounded-full ${tone}`} />}{label}</div>
