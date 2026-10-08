@@ -24,3 +24,12 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Netlify previews
+
+This application uses TanStack Start server-side rendering, not a static SPA.
+The Nitro `netlify` preset generates the server function in
+`.netlify/functions-internal` and publishes browser assets to `dist`.
+`netlify.toml` keeps the build command and publish directory consistent for
+production and deploy previews. Page requests and server functions are handled
+by the generated server, so no SPA redirect to `index.html` is needed.
