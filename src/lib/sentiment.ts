@@ -17,9 +17,9 @@ export const SOURCE_LABELS: Record<SourceType, string> = {
 
 export interface RawComment {
   text: string;
-  author?: string | null;
-  published_at?: string | null;
-  like_count?: number | null;
+  author?: string | null | undefined;
+  published_at?: string | null | undefined;
+  like_count?: number | null | undefined;
 }
 
 export interface ScoredComment extends RawComment {
@@ -106,7 +106,7 @@ export function computeStats(scored: ScoredComment[], removedEmpty = 0, removedD
     .map(([emoji, m]) => ({ emoji, count: m.count, avgCompound: +(m.sum / m.count).toFixed(3) }));
 
   const bins = Array.from({ length: 10 }, (_, i) => ({ bin: (-1 + i * 0.2).toFixed(1), count: 0 }));
-  for (const c of scored) bins[Math.min(9, Math.floor((c.compound + 1) / 0.2))].count++;
+  for (const c of scored) bins[Math.min(9, Math.floor((c.compound + 1) / 0.2))]!.count++;
 
   const words = new Map<string, number>();
   for (const c of scored) {
@@ -152,7 +152,7 @@ export function parseYouTubeId(input: string): string | null {
       const v = u.searchParams.get("v");
       if (v) return v.slice(0, 11);
       const m = u.pathname.match(/\/(shorts|embed|live)\/([\w-]{11})/);
-      if (m) return m[2];
+      if (m) return m[2] ?? null;
     }
   } catch { /* not a URL */ }
   return null;
