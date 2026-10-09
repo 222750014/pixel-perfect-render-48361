@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
+import { Download, Printer, Sparkles, Send, MessageSquare, ChartNoAxesCombined, Smile } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, SentimentDot } from "@/components/AppShell";
@@ -42,6 +43,8 @@ export const Route = createFileRoute("/analysis/$id")({
     meta: loaderData
       ? [
           { title: `${loaderData.title} — Sentiment Lab` },
+          { property: "og:type", content: "website" },
+          { name: "twitter:card", content: "summary_large_image" },
           { name: "description", content: `Sentiment analysis results for ${loaderData.title}.` },
           { property: "og:title", content: `${loaderData.title} — Sentiment Lab` },
           { property: "og:description", content: "VADER sentiment, emoji and AI insights for real audience comments." },
@@ -86,18 +89,18 @@ function AnalysisPage() {
           <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
             Source: <span className="text-foreground">{source}</span> · {new Date(a.created_at).toLocaleString()}
           </p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">{a.title}</h1>
+          <h1 className="mt-1 break-words text-3xl font-semibold">{a.title}</h1>
           {a.source_ref && (a.source_ref.startsWith("http")
-            ? <a href={a.source_ref} target="_blank" rel="noreferrer" className="font-mono text-sm text-primary underline">{a.source_ref}</a>
+            ? <a href={a.source_ref} target="_blank" rel="noreferrer" className="break-all font-mono text-xs text-primary underline">{a.source_ref}</a>
             : <p className="font-mono text-sm text-muted-foreground">{a.source_ref}</p>)}
         </div>
         <div className="no-print flex gap-2">
-          <Button variant="outline" onClick={() => exportCsv(a.title, comments)}>Export CSV</Button>
-          <Button variant="outline" onClick={() => window.print()}>Print / PDF report</Button>
+          <Button variant="outline" onClick={() => exportCsv(a.title, comments)}><Download />Export CSV</Button>
+          <Button variant="outline" onClick={() => window.print()}><Printer />Print / PDF report</Button>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
+      <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
         <Stat label="Total comments" value={s.total} />
         <Stat label="Positive" value={`${s.positive}`} sub={`${pct(s.positive, s.total)}%`} tone="bg-positive" />
         <Stat label="Neutral" value={`${s.neutral}`} sub={`${pct(s.neutral, s.total)}%`} tone="bg-neutral" />
@@ -112,25 +115,25 @@ function AnalysisPage() {
 
       <Tabs defaultValue="overview" className="mt-8">
         <TabsList className="no-print flex-wrap">
-          <TabsTrigger value="overview">Sentiment results</TabsTrigger>
-          <TabsTrigger value="emoji">Emoji & emotion</TabsTrigger>
-          <TabsTrigger value="insights">AI insights</TabsTrigger>
+          <TabsTrigger value="overview"><ChartNoAxesCombined size={16} />Sentiment results</TabsTrigger>
+          <TabsTrigger value="emoji"><Smile size={16} />Emoji & emotion</TabsTrigger>
+          <TabsTrigger value="insights"><Sparkles size={16} />AI insights</TabsTrigger>
           <TabsTrigger value="comments">Comments</TabsTrigger>
-          <TabsTrigger value="chat">Chatbot</TabsTrigger>
+          <TabsTrigger value="chat"><MessageSquare size={16} />Chatbot</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="grid gap-4 lg:grid-cols-2">
-          <Panel title="Sentiment distribution (pie)">
+          <Panel title="Sentiment distribution">
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={95} label={({ name, value }) => `${name} ${pct(value as number, s.total)}%`}>
+                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={65} outerRadius={95} paddingAngle={3}>
                   {pieData.map((d) => <Cell key={d.name} fill={COLORS[d.name as keyof typeof COLORS]} />)}
                 </Pie>
-                <Tooltip />
+                <Tooltip /><Legend />
               </PieChart>
             </ResponsiveContainer>
           </Panel>
-          <Panel title="Positive vs neutral vs negative (bar)">
+          <Panel title="Sentiment breakdown">
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={pieData}><CartesianGrid strokeDasharray="3 3" stroke="var(--border)" /><XAxis dataKey="name" /><YAxis allowDecimals={false} /><Tooltip />
                 <Bar dataKey="value">{pieData.map((d) => <Cell key={d.name} fill={COLORS[d.name as keyof typeof COLORS]} />)}</Bar>
@@ -192,7 +195,7 @@ function AnalysisPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart><Pie data={insights.emotions} dataKey="share" nameKey="emotion" outerRadius={90} label={({ name }) => name as string}>
-                    {insights.emotions.map((_, i) => <Cell key={i} fill={EMO_COLORS[i % EMO_COLORS.length] ?? "gray"} />)}</Pie><Tooltip /></PieChart>
+                    {insights.emotions.map((_, i) => <Cell key={i} fill={EMO_COLORS[i % EMO_COLORS.length] ?? "var(--muted-foreground)"} />)}</Pie><Tooltip /></PieChart>
                 </ResponsiveContainer>
                 <div className="text-sm"><p className="font-medium">Dominant emotion: {insights.dominantEmotion}</p><p className="mt-2 text-muted-foreground">{insights.emojiInterpretation}</p></div>
               </div>
@@ -236,8 +239,8 @@ function Stat({ label, value, sub, tone }: { label: string; value: string | numb
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-lg border bg-card p-5 ${className}`}>
-      <h3 className="mb-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">{title}</h3>
+    <section className={`border-t py-5 ${className}`}>
+      <h3 className="mb-4 text-sm font-semibold text-foreground">{title}</h3>
       {children}
     </section>
   );
@@ -261,7 +264,7 @@ function InsightsCTA({ loading, onClick }: { loading: boolean; onClick: () => vo
   return (
     <div className="no-print flex flex-col items-start gap-2">
       <p className="text-sm text-muted-foreground">Generate an AI interpretation grounded in the calculated VADER statistics and real comments.</p>
-      <Button disabled={loading} onClick={onClick}>{loading ? "Generating insights…" : "Generate AI insights"}</Button>
+      <Button disabled={loading} onClick={onClick}><Sparkles />{loading ? "Generating insights…" : "Generate AI insights"}</Button>
     </div>
   );
 }
@@ -331,7 +334,7 @@ function Chat({ id, initial }: { id: string; initial: { id: string; role: string
     try {
       const r = await ask({ data: { id, message: text } });
       if (r.error || !r.reply) toast.error(r.error ?? "No reply");
-      else setMsgs((m) => [...m, { role: "assistant", content: r.reply! }]);
+      else { const reply = r.reply; setMsgs((m) => [...m, { role: "assistant", content: reply }]); }
     } catch { toast.error("Network error"); } finally { setBusy(false); }
   }
   return (
@@ -347,12 +350,12 @@ function Chat({ id, initial }: { id: string; initial: { id: string; role: string
       </div>
       <div className="no-print border-t p-3">
         <div className="mb-2 flex flex-wrap gap-1">
-          {SUGGESTIONS.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full border px-3 py-1 text-xs hover:bg-muted">{s}</button>)}
+          {SUGGESTIONS.map((s) => <Button key={s} size="sm" variant="outline" disabled={busy} onClick={() => send(s)}>{s}</Button>)}
         </div>
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); send(input); }}>
           <Textarea rows={2} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about this dataset…"
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }} />
-          <Button type="submit" disabled={busy || !input.trim()} className="self-end">Send</Button>
+          <Button type="submit" disabled={busy || !input.trim()} className="self-end"><Send />Send</Button>
         </form>
       </div>
     </div>

@@ -5,6 +5,8 @@ export const Route = createFileRoute("/project")({
   head: () => ({
     meta: [
       { title: "Project & documentation — Sentiment Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "How the Sentiment Lab works: VADER, AI emotion analysis, YouTube API, TikTok CSV import, architecture and limitations." },
       { property: "og:title", content: "How Sentiment Lab works" },
       { property: "og:description", content: "Methodology, architecture and limitations of a VADER-based sentiment analysis tool." },
@@ -40,11 +42,11 @@ Database (Lovable Cloud): analyses · comments · chat_messages`}</pre> },
 function ProjectPage() {
   return (
     <AppShell>
-      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Presentation mode</p>
-      <h1 className="mt-1 text-4xl font-bold tracking-tight">How Sentiment Lab works</h1>
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Methodology & reference</p>
+      <h1 className="mt-1 text-3xl font-semibold">How Sentiment Lab works</h1>
+      <div className="mt-8 max-w-4xl">
         {SECTIONS.map((s, i) => (
-          <section key={s.h} className={`rounded-lg border bg-card p-6 text-sm leading-relaxed ${i === 1 || i === 8 ? "md:col-span-2" : ""}`}>
+          <section key={s.h} className={`border-t py-7 text-sm leading-relaxed ${i === 1 || i === 8 ? "md:col-span-2" : ""}`}>
             <h2 className="mb-2 text-lg font-semibold"><span className="mr-2 font-mono text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>{s.h}</h2>
             {s.body}
           </section>

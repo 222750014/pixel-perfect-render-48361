@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { Youtube, FileSpreadsheet, TextCursorInput, Upload, ArrowRight, Music2 } from "lucide-react";
 import Papa from "papaparse";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -16,6 +17,8 @@ export const Route = createFileRoute("/analyze")({
   head: () => ({
     meta: [
       { title: "Analyze comments — Sentiment Lab" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Import comments from YouTube, TikTok CSV exports, CSV files or manual text and run VADER sentiment analysis." },
       { property: "og:title", content: "Analyze comments — Sentiment Lab" },
       { property: "og:description", content: "Import real comments and classify their sentiment with VADER." },
@@ -86,7 +89,7 @@ function AnalyzePage() {
 
   const csvPanel = (source: SourceType) => (
     <div className="space-y-4">
-      <Input type="file" accept=".csv" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0], source)} />
+      <label className="flex cursor-pointer flex-col items-center gap-3 rounded-lg border border-dashed border-input bg-card px-5 py-10 text-sm hover:border-primary"><Upload size={26} className="text-primary" /><span className="font-medium">Choose a CSV file</span><Input aria-label="Upload CSV" className="max-w-sm" type="file" accept=".csv" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0], source)} /></label>
       {csv && csv.source === source && (
         <div className="rounded-md border bg-muted/40 p-4">
           <p className="text-sm"><b>{csv.rows.length}</b> comments found in <code className="font-mono">{csv.column}</code> column of {csv.name}.</p>
@@ -103,25 +106,25 @@ function AnalyzePage() {
 
   return (
     <AppShell>
-      <h1 className="text-3xl font-bold tracking-tight">Analyze comments</h1>
-      <p className="mt-1 text-muted-foreground">Choose a data source. The source is recorded and shown with every analysis.</p>
+      <p className="mb-2 font-mono text-[10px] uppercase text-primary">New analysis</p>
+      <h1 className="text-3xl font-semibold">Analyze comments</h1>
 
-      <Tabs defaultValue="youtube" className="mt-6">
+      <Tabs defaultValue="youtube" className="mt-8 max-w-4xl">
         <TabsList className="flex-wrap">
-          <TabsTrigger value="youtube">YouTube</TabsTrigger>
-          <TabsTrigger value="tiktok">TikTok</TabsTrigger>
-          <TabsTrigger value="csv">CSV upload</TabsTrigger>
-          <TabsTrigger value="manual">Manual input</TabsTrigger>
+          <TabsTrigger value="youtube"><Youtube size={16} />YouTube</TabsTrigger>
+          <TabsTrigger value="tiktok"><Music2 size={16} />TikTok</TabsTrigger>
+          <TabsTrigger value="csv"><FileSpreadsheet size={16} />CSV upload</TabsTrigger>
+          <TabsTrigger value="manual"><TextCursorInput size={16} />Manual input</TabsTrigger>
         </TabsList>
 
-        <div className="mt-4 rounded-lg border bg-card p-6">
+        <div className="mt-6 border-t-0 py-3">
           <TabsContent value="youtube" className="mt-0 space-y-4">
-            <p className="text-sm text-muted-foreground">Fetches public top-level comments via the official <b>YouTube Data API v3</b> (requires a configured API key).</p>
+            <div className="mb-6 flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-lg bg-secondary text-primary"><Youtube size={22} /></span><div><h2 className="font-semibold">YouTube comments</h2><p className="mt-1 text-xs text-muted-foreground">Public top-level comments · YouTube Data API v3</p></div></div>
             <div className="grid gap-4 md:grid-cols-[1fr_160px]">
-              <div><Label>Video URL or ID</Label><Input value={ytUrl} onChange={(e) => setYtUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /></div>
-              <div><Label>Max comments</Label><Input type="number" min={10} max={1000} value={ytMax} onChange={(e) => setYtMax(Math.max(10, Math.min(1000, +e.target.value || 100)))} /></div>
+              <div><Label htmlFor="youtube-url" className="mb-2">Video URL or ID</Label><Input id="youtube-url" className="h-11 bg-card" value={ytUrl} onChange={(e) => setYtUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /></div>
+              <div><Label htmlFor="youtube-limit" className="mb-2">Max comments</Label><Input id="youtube-limit" className="h-11 bg-card" type="number" min={10} max={1000} value={ytMax} onChange={(e) => setYtMax(Math.max(10, Math.min(1000, +e.target.value || 100)))} /></div>
             </div>
-            <Button disabled={busy || !ytUrl.trim()} onClick={runYouTube}>{busy ? "Fetching & analyzing…" : "Fetch & analyze"}</Button>
+            <Button disabled={busy || !ytUrl.trim()} onClick={runYouTube}><ArrowRight />{busy ? "Fetching & analyzing…" : "Fetch & analyze"}</Button>
           </TabsContent>
 
           <TabsContent value="tiktok" className="mt-0 space-y-4">
@@ -137,8 +140,8 @@ function AnalyzePage() {
           </TabsContent>
 
           <TabsContent value="manual" className="mt-0 space-y-4">
-            <div><Label>Dataset name</Label><Input value={manualTitle} onChange={(e) => setManualTitle(e.target.value)} placeholder="e.g. Product launch feedback" /></div>
-            <div><Label>Comments (one per line)</Label><Textarea rows={10} value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Paste real comments here, one per line" /></div>
+            <div><Label htmlFor="dataset-name" className="mb-2">Dataset name</Label><Input id="dataset-name" className="h-11 bg-card" value={manualTitle} onChange={(e) => setManualTitle(e.target.value)} placeholder="e.g. Product launch feedback" /></div>
+            <div><Label htmlFor="manual-comments" className="mb-2">Comments (one per line)</Label><Textarea id="manual-comments" className="bg-card" rows={10} value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Paste real comments here, one per line" /></div>
             <Button disabled={busy || !manual.trim()} onClick={() => run(manualTitle.trim() || "Manual input", "manual", null, manual.split("\n").map((text) => ({ text })))}>
               {busy ? "Analyzing…" : `Analyze ${manual.split("\n").filter((l) => l.trim()).length} comments`}
             </Button>
