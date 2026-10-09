@@ -1,37 +1,42 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { Activity, LayoutGrid, MessageSquarePlus, BookOpen, ArrowUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const NAV = [
-  { to: "/", label: "Dashboard" },
-  { to: "/analyze", label: "Analyze comments" },
-  { to: "/project", label: "Project & docs" },
+  { to: "/", label: "Overview", icon: LayoutGrid },
+  { to: "/analyze", label: "Analyze comments", icon: MessageSquarePlus },
+  { to: "/project", label: "Project & docs", icon: BookOpen },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="no-print sticky top-0 z-20 border-b border-sidebar-border bg-sidebar text-sidebar-foreground">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-6 px-4 py-3">
-          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="grid h-7 w-7 place-items-center rounded bg-sidebar-primary font-mono text-xs text-sidebar-primary-foreground">±</span>
-            Sentiment Lab
-          </Link>
-          <nav className="flex flex-wrap gap-1 text-sm">
-            {NAV.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                activeOptions={{ exact: n.to === "/" }}
-                className="rounded px-3 py-1.5 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
+    <div className="app-layout min-h-screen bg-background">
+      <aside className="app-sidebar no-print border-sidebar-border bg-sidebar text-sidebar-foreground">
+        <Link to="/" className="flex items-center gap-2 whitespace-nowrap px-1 text-[17px] font-semibold">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"><Activity size={19} /></span>
+          <span>Sentiment Lab<span className="text-primary">.</span></span>
+        </Link>
+        <p className="sidebar-caption mt-12 px-3 font-mono text-[10px] uppercase text-muted-foreground">Workspace</p>
+        <nav aria-label="Main navigation" className="sidebar-nav mt-3 flex flex-col gap-2">
+          {NAV.map((n) => (
+            <Button key={n.to} asChild variant="ghost" className="h-11 justify-start px-3 text-sidebar-foreground/75">
+              <Link to={n.to} activeOptions={{ exact: n.to === "/" }} activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}><n.icon size={18} />{n.label}</Link>
+            </Button>
+          ))}
+        </nav>
+        <div className="sidebar-bottom mt-auto border-t border-sidebar-border pt-5">
+          <div className="flex items-center gap-2 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-positive" />VADER sentiment engine</div>
+          <Link to="/project" className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">Methodology & limitations<ArrowUpRight size={13} /></Link>
         </div>
-      </header>
-      <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
+      </aside>
+      <div className="min-w-0">
+        <header className="no-print flex h-16 items-center justify-between border-b bg-card px-6 lg:px-10">
+          <span className="text-xs text-muted-foreground">Workspace <span className="mx-2 text-border">/</span><span className="font-medium text-foreground">Audience insights</span></span>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="h-6 w-6 rounded-full bg-secondary text-center leading-6 text-secondary-foreground">SL</span><span className="hidden sm:inline">Sentiment Lab</span></div>
+        </header>
+        <main className="mx-auto w-full max-w-[1440px] px-5 py-8 lg:px-10 lg:py-10">{children}</main>
+      </div>
     </div>
   );
 }
