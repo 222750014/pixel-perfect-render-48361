@@ -13,9 +13,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app-layout min-h-screen bg-background">
       <aside className="app-sidebar no-print border-sidebar-border bg-sidebar text-sidebar-foreground">
-        <Link to="/" className="flex items-center gap-3 px-2 text-xl font-semibold">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"><Activity size={21} /></span>
-          Sentiment Lab<span className="text-primary">.</span>
+        <Link to="/" className="flex items-center gap-2 whitespace-nowrap px-1 text-[17px] font-semibold">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"><Activity size={19} /></span>
+          <span>Sentiment Lab<span className="text-primary">.</span></span>
         </Link>
         <p className="sidebar-caption mt-12 px-3 font-mono text-[10px] uppercase text-muted-foreground">Workspace</p>
         <nav aria-label="Main navigation" className="sidebar-nav mt-3 flex flex-col gap-2">
