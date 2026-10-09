@@ -106,21 +106,26 @@
 }
 
 .dark {
-  --background: oklch(0.17 0.01 165);
+  color-scheme: dark;
+  --background: oklch(0.18 0.004 165);
   --foreground: oklch(0.94 0.005 165);
-  --card: oklch(0.21 0.012 165);
+  --card: oklch(0.225 0.005 165);
   --popover: var(--card);
   --primary: oklch(0.73 0.105 165);
   --primary-foreground: oklch(0.18 0.025 165);
-  --secondary: oklch(0.28 0.025 165);
+  --secondary: oklch(0.29 0.018 165);
   --secondary-foreground: var(--foreground);
-  --muted: oklch(0.26 0.012 165);
-  --muted-foreground: oklch(0.7 0.014 165);
-  --accent: oklch(0.3 0.03 165);
+  --muted: oklch(0.275 0.005 165);
+  --muted-foreground: oklch(0.73 0.008 165);
+  --accent: oklch(0.3 0.023 165);
   --accent-foreground: var(--primary);
-  --border: oklch(0.33 0.014 165);
+  --border: oklch(0.34 0.006 165);
   --input: var(--border);
-  --sidebar: var(--card);
+  --sidebar: oklch(0.205 0.005 165);
+  --positive: oklch(0.72 0.13 165);
+  --neutral: oklch(0.8 0.13 85);
+  --negative: oklch(0.7 0.16 28);
+  --destructive: oklch(0.72 0.15 27);
 }
 
 .app-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); }
