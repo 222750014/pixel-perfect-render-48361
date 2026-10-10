@@ -364,7 +364,7 @@ function Chat({ id, initial }: { id: string; initial: { id: string; role: string
 
 function exportCsv(title: string, rows: Row[]) {
   const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const lines = ["comment,author,date,sentiment,compound,positive,neutral,negative"].concat(
+  const lines = ["comment,author,date,sentiment,confidence,score,positive,neutral,negative"].concat(
     rows.map((r) => [r.text, r.author, r.published_at, r.label, confidence(r) + "%", r.compound, r.pos, r.neu, r.neg].map(esc).join(",")),
   );
   const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
