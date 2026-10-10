@@ -105,7 +105,7 @@ function AnalysisPage() {
         <Stat label="Positive" value={`${s.positive}`} sub={`${pct(s.positive, s.total)}%`} tone="bg-positive" />
         <Stat label="Neutral" value={`${s.neutral}`} sub={`${pct(s.neutral, s.total)}%`} tone="bg-neutral" />
         <Stat label="Negative" value={`${s.negative}`} sub={`${pct(s.negative, s.total)}%`} tone="bg-negative" />
-        <Stat label="Avg compound" value={s.avgCompound.toFixed(3)} />
+        <Stat label="Avg sentiment score" value={s.avgCompound.toFixed(3)} />
         <Stat label="Top emotion" value={insights?.dominantEmotion ?? "—"} sub={insights ? "AI-assisted" : "generate insights"} />
         <Stat label="Top emoji" value={s.topEmojis[0]?.emoji ?? "—"} sub={s.topEmojis[0] ? `×${s.topEmojis[0].count}` : undefined} />
       </div>
@@ -140,7 +140,7 @@ function AnalysisPage() {
               </BarChart>
             </ResponsiveContainer>
           </Panel>
-          <Panel title="Compound score distribution">
+          <Panel title="Sentiment score distribution (P(pos) − P(neg))">
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={s.histogram}><CartesianGrid strokeDasharray="3 3" stroke="var(--border)" /><XAxis dataKey="bin" /><YAxis allowDecimals={false} /><Tooltip />
                 <Bar dataKey="count" fill="var(--chart-1)" />
@@ -180,7 +180,7 @@ function AnalysisPage() {
           </Panel>
           <Panel title="Emoji → sentiment relationship (avg model score)">
             <table className="w-full text-sm">
-              <thead className="text-left font-mono text-xs text-muted-foreground"><tr><th className="py-1">Emoji</th><th>Count</th><th>Avg compound</th></tr></thead>
+              <thead className="text-left font-mono text-xs text-muted-foreground"><tr><th className="py-1">Emoji</th><th>Count</th><th>Avg score</th></tr></thead>
               <tbody>
                 {s.topEmojis.map((e) => (
                   <tr key={e.emoji} className="border-t"><td className="py-1.5 text-lg">{e.emoji}</td><td className="font-mono">{e.count}</td>
@@ -190,7 +190,7 @@ function AnalysisPage() {
             </table>
           </Panel>
           <Panel title="Emotion distribution (AI-assisted)" className="lg:col-span-2">
-            <p className="mb-3 text-xs text-muted-foreground">VADER provides the primary sentiment classification. The emotion estimate below is an additional AI interpretation (Hugging Face-style emotion labels) and should be checked against the calculated statistics.</p>
+            <p className="mb-3 text-xs text-muted-foreground">The Hugging Face model provides the sentiment classification. The emotion estimate below is an additional AI interpretation (Hugging Face-style emotion labels) and should be checked against the calculated statistics.</p>
             {insights?.emotions?.length ? (
               <div className="grid gap-4 md:grid-cols-2">
                 <ResponsiveContainer width="100%" height={240}>
@@ -263,7 +263,7 @@ function Extremes({ title, rows }: { title: string; rows: { id: string; text: st
 function InsightsCTA({ loading, onClick }: { loading: boolean; onClick: () => void }) {
   return (
     <div className="no-print flex flex-col items-start gap-2">
-      <p className="text-sm text-muted-foreground">Generate an AI interpretation grounded in the calculated VADER statistics and real comments.</p>
+      <p className="text-sm text-muted-foreground">Generate an AI interpretation grounded in the calculated model statistics and real comments.</p>
       <Button disabled={loading} onClick={onClick}><Sparkles />{loading ? "Generating insights…" : "Generate AI insights"}</Button>
     </div>
   );
@@ -321,7 +321,7 @@ function CommentTable({ comments }: { comments: Row[] }) {
   );
 }
 
-const SUGGESTIONS = ["What is the overall sentiment?", "What are people complaining about?", "What do people like most?", "Explain the pie chart.", "What should the content creator improve?", "What does the VADER compound score mean?"];
+const SUGGESTIONS = ["What is the overall sentiment?", "What are people complaining about?", "What do people like most?", "Explain the pie chart.", "What should the content creator improve?", "How confident is the model?"];
 
 function Chat({ id, initial }: { id: string; initial: { id: string; role: string; content: string }[] }) {
   const ask = useServerFn(askChat);

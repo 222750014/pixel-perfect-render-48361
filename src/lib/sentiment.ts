@@ -54,7 +54,7 @@ export function classify(compound: number): SentimentLabel {
   return "Neutral";
 }
 
-/** Cleaning keeps emojis, punctuation and casing (VADER uses them as intensity cues). */
+/** Cleaning keeps emojis, punctuation and casing (kept so the model sees the original text). */
 export function cleanComments(raw: RawComment[]) {
   let removedEmpty = 0;
   let removedDuplicates = 0;

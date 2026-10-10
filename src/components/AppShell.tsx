@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="sidebar-bottom mt-auto border-t border-sidebar-border pt-5">
-          <div className="flex items-center gap-2 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-positive" />VADER sentiment engine</div>
+          <div className="flex items-center gap-2 text-xs font-medium"><span className="h-2 w-2 rounded-full bg-positive" />Hugging Face RoBERTa model</div>
           <Link to="/project" className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">Methodology & limitations<ArrowUpRight size={13} /></Link>
         </div>
       </aside>
