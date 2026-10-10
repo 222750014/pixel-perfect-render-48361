@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { askChat, generateInsights, type Insights } from "@/lib/analysis.functions";
-import { SOURCE_LABELS, pct, type AnalysisStats, type SourceType } from "@/lib/sentiment";
+import { SOURCE_LABELS, confidence, pct, type AnalysisStats, type SourceType } from "@/lib/sentiment";
 
 const analysisQuery = (id: string) => queryOptions({
   queryKey: ["analysis", id],
@@ -296,14 +296,14 @@ function CommentTable({ comments }: { comments: Row[] }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-muted/50 text-left font-mono text-xs text-muted-foreground">
-            <tr><th className="p-2">Comment</th><th className="p-2">Sentiment</th><th className="p-2">Compound</th><th className="p-2">Pos</th><th className="p-2">Neu</th><th className="p-2">Neg</th></tr>
+            <tr><th className="p-2">Comment</th><th className="p-2">Sentiment</th><th className="p-2">Confidence</th><th className="p-2">Score</th><th className="p-2">Pos</th><th className="p-2">Neu</th><th className="p-2">Neg</th></tr>
           </thead>
           <tbody>
             {view.map((c) => (
               <tr key={c.id} className="cursor-pointer border-t align-top hover:bg-muted/30" onClick={() => setOpen(open === c.id ? null : c.id)}>
                 <td className={`max-w-xl p-2 ${open === c.id ? "whitespace-pre-wrap" : "truncate"}`}>{c.text}{open === c.id && c.author && <div className="mt-1 text-xs text-muted-foreground">— {c.author}{c.published_at && `, ${new Date(c.published_at).toLocaleDateString()}`}</div>}</td>
                 <td className="whitespace-nowrap p-2"><SentimentDot label={c.label} /> {c.label}</td>
-                <td className="p-2 font-mono">{c.compound.toFixed(3)}</td>
+                <td className="p-2 font-mono">{confidence(c)}%</td><td className="p-2 font-mono">{c.compound.toFixed(3)}</td>
                 <td className="p-2 font-mono text-muted-foreground">{c.pos.toFixed(2)}</td>
                 <td className="p-2 font-mono text-muted-foreground">{c.neu.toFixed(2)}</td>
                 <td className="p-2 font-mono text-muted-foreground">{c.neg.toFixed(2)}</td>
@@ -365,7 +365,7 @@ function Chat({ id, initial }: { id: string; initial: { id: string; role: string
 function exportCsv(title: string, rows: Row[]) {
   const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const lines = ["comment,author,date,sentiment,compound,positive,neutral,negative"].concat(
-    rows.map((r) => [r.text, r.author, r.published_at, r.label, r.compound, r.pos, r.neu, r.neg].map(esc).join(",")),
+    rows.map((r) => [r.text, r.author, r.published_at, r.label, confidence(r) + "%", r.compound, r.pos, r.neu, r.neg].map(esc).join(",")),
   );
   const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
