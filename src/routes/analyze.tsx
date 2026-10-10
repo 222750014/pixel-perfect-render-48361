@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Youtube, FileSpreadsheet, TextCursorInput, Upload, ArrowRight, Music2 } from "lucide-react";
+import { Youtube, FileSpreadsheet, TextCursorInput, Upload, ArrowRight } from "lucide-react";
 import Papa from "papaparse";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAnalysis, fetchYouTubeComments } from "@/lib/analysis.functions";
-import { SOURCE_LABELS, type RawComment, type SourceType } from "@/lib/sentiment";
+import { type RawComment, type SourceType } from "@/lib/sentiment";
 
 export const Route = createFileRoute("/analyze")({
   head: () => ({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/analyze")({
       { title: "Analyze comments — Sentiment Lab" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "description", content: "Import comments from YouTube, TikTok CSV exports, CSV files or manual text and run VADER sentiment analysis." },
+      { name: "description", content: "Import comments from YouTube, CSV files or manual text and run VADER sentiment analysis." },
       { property: "og:title", content: "Analyze comments — Sentiment Lab" },
       { property: "og:description", content: "Import real comments and classify their sentiment with VADER." },
     ],
@@ -112,7 +112,6 @@ function AnalyzePage() {
       <Tabs defaultValue="youtube" className="mt-8 max-w-4xl">
         <TabsList className="flex-wrap">
           <TabsTrigger value="youtube"><Youtube size={16} />YouTube</TabsTrigger>
-          <TabsTrigger value="tiktok"><Music2 size={16} />TikTok</TabsTrigger>
           <TabsTrigger value="csv"><FileSpreadsheet size={16} />CSV upload</TabsTrigger>
           <TabsTrigger value="manual"><TextCursorInput size={16} />Manual input</TabsTrigger>
         </TabsList>
@@ -125,13 +124,6 @@ function AnalyzePage() {
               <div><Label htmlFor="youtube-limit" className="mb-2">Max comments</Label><Input id="youtube-limit" className="h-11 bg-card" type="number" min={10} max={1000} value={ytMax} onChange={(e) => setYtMax(Math.max(10, Math.min(1000, +e.target.value || 100)))} /></div>
             </div>
             <Button disabled={busy || !ytUrl.trim()} onClick={runYouTube}><ArrowRight />{busy ? "Fetching & analyzing…" : "Fetch & analyze"}</Button>
-          </TabsContent>
-
-          <TabsContent value="tiktok" className="mt-0 space-y-4">
-            <div className="rounded-md border border-accent bg-accent/30 p-4 text-sm">
-              <b>TikTok API status: not connected.</b> TikTok only provides comment data through its Research API, which requires an approved application. This app does not scrape TikTok. Export your comments to CSV (e.g. from TikTok's data download or an approved tool) and upload them here — they'll be labelled “{SOURCE_LABELS.tiktok_csv}”.
-            </div>
-            {csvPanel("tiktok_csv")}
           </TabsContent>
 
           <TabsContent value="csv" className="mt-0 space-y-4">

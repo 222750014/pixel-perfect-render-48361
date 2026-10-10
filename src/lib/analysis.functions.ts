@@ -26,7 +26,7 @@ export const createAnalysis = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       title: z.string().min(1).max(200),
-      source: z.enum(["youtube", "tiktok_api", "tiktok_csv", "csv", "manual"]),
+      source: z.enum(["youtube", "csv", "manual"]),
       sourceRef: z.string().max(500).nullish(),
       comments: z.array(commentSchema).min(1).max(5000),
     }).parse(d),
