@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Sentiment Lab — Comment Sentiment Analysis" },
-      { name: "description", content: "Analyze real YouTube, TikTok and CSV comments with VADER sentiment and AI insights." },
+      { name: "description", content: "Analyze real YouTube, CSV and manually entered comments with VADER sentiment and AI insights." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },

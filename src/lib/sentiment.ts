@@ -5,12 +5,10 @@
 import vader from "vader-sentiment";
 
 export type SentimentLabel = "Positive" | "Neutral" | "Negative";
-export type SourceType = "youtube" | "tiktok_api" | "tiktok_csv" | "csv" | "manual";
+export type SourceType = "youtube" | "csv" | "manual";
 
 export const SOURCE_LABELS: Record<SourceType, string> = {
   youtube: "YouTube API",
-  tiktok_api: "TikTok API",
-  tiktok_csv: "TikTok CSV Import",
   csv: "CSV Upload",
   manual: "Manual Input",
 };

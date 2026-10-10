@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
       { title: "Overview — Sentiment Lab" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "description", content: "Your saved sentiment analyses of real YouTube, TikTok and CSV comments." },
+      { name: "description", content: "Your saved sentiment analyses of real YouTube, CSV and manually entered comments." },
       { property: "og:title", content: "Sentiment Lab — Dashboard" },
       { property: "og:description", content: "Saved VADER sentiment analyses with AI-assisted insights." },
     ],
@@ -79,7 +79,7 @@ function Index() {
               const s = a.stats as unknown as AnalysisStats;
               return <Link key={a.id} to="/analysis/$id" params={{ id: a.id }} className="group rounded-lg border bg-card p-5 transition hover:border-primary">
                 <div className="flex items-center justify-between gap-3 text-[11px] text-muted-foreground">
-                  <span className="rounded bg-secondary px-2 py-1 font-medium text-secondary-foreground">{SOURCE_LABELS[a.source as SourceType] ?? a.source}</span>
+                  <span className="rounded bg-secondary px-2 py-1 font-medium text-secondary-foreground">{SOURCE_LABELS[a.source as SourceType] ?? "Archived source"}</span>
                   <span>{new Date(a.created_at).toLocaleDateString()}</span>
                 </div>
                 <div className="mt-4 flex items-start justify-between gap-3"><h3 className="line-clamp-2 font-semibold group-hover:text-primary">{a.title}</h3><ArrowUpRight size={17} className="shrink-0 text-muted-foreground group-hover:text-primary" /></div>

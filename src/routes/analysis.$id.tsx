@@ -68,7 +68,7 @@ function AnalysisPage() {
   const { analysis: a, comments } = data;
   const s = a.stats as unknown as AnalysisStats;
   const insights = a.insights as unknown as Insights | null;
-  const source = SOURCE_LABELS[a.source as SourceType] ?? a.source;
+   const source = SOURCE_LABELS[a.source as SourceType] ?? "Archived source";
 
   async function makeInsights() {
     setLoadingInsights(true);
