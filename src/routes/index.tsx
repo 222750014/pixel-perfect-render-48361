@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "description", content: "Your saved sentiment analyses of real YouTube, CSV and manually entered comments." },
       { property: "og:title", content: "Sentiment Lab — Dashboard" },
-      { property: "og:description", content: "Saved VADER sentiment analyses with AI-assisted insights." },
+      { property: "og:description", content: "Saved AI sentiment analyses with AI-assisted insights." },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(analysesQuery),

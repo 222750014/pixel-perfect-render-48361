@@ -1,8 +1,5 @@
 // Shared, pure analysis helpers (safe on client and server).
-// VADER is the primary sentiment classifier; thresholds follow the original paper.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - package ships no types
-import vader from "vader-sentiment";
+// Sentiment comes from the Hugging Face model (see hf.server.ts); emojis are only counted, never scored.
 
 export type SentimentLabel = "Positive" | "Neutral" | "Negative";
 export type SourceType = "youtube" | "csv" | "manual";
@@ -74,11 +71,14 @@ export function cleanComments(raw: RawComment[]) {
   return { comments: out, removedEmpty, removedDuplicates };
 }
 
-export function scoreComment(c: RawComment): ScoredComment {
-  const s = vader.SentimentIntensityAnalyzer.polarity_scores(c.text) as {
-    pos: number; neu: number; neg: number; compound: number;
-  };
-  return { ...c, ...s, label: classify(s.compound), emojis: extractEmojis(c.text) };
+/** Builds a scored comment from model probabilities. compound = P(positive) − P(negative). */
+export function scoreComment(c: RawComment, p: { pos: number; neu: number; neg: number }): ScoredComment {
+  const label: SentimentLabel = p.pos >= p.neu && p.pos >= p.neg ? "Positive" : p.neg >= p.neu ? "Negative" : "Neutral";
+  return { ...c, ...p, compound: +(p.pos - p.neg).toFixed(4), label, emojis: extractEmojis(c.text) };
+}
+
+export function confidence(c: { pos: number; neu: number; neg: number }) {
+  return Math.round(Math.max(c.pos, c.neu, c.neg) * 100);
 }
 
 const STOP = new Set(

@@ -47,7 +47,7 @@ export const Route = createFileRoute("/analysis/$id")({
           { name: "twitter:card", content: "summary_large_image" },
           { name: "description", content: `Sentiment analysis results for ${loaderData.title}.` },
           { property: "og:title", content: `${loaderData.title} — Sentiment Lab` },
-          { property: "og:description", content: "VADER sentiment, emoji and AI insights for real audience comments." },
+          { property: "og:description", content: "Hugging Face sentiment, emoji and AI insights for real audience comments." },
         ]
       : [{ title: "Analysis not found" }, { name: "robots", content: "noindex" }],
   }),
@@ -178,7 +178,7 @@ function AnalysisPage() {
               </ResponsiveContainer>
             ) : <p className="text-sm text-muted-foreground">No emojis detected in this dataset.</p>}
           </Panel>
-          <Panel title="Emoji → sentiment relationship (avg VADER compound)">
+          <Panel title="Emoji → sentiment relationship (avg model score)">
             <table className="w-full text-sm">
               <thead className="text-left font-mono text-xs text-muted-foreground"><tr><th className="py-1">Emoji</th><th>Count</th><th>Avg compound</th></tr></thead>
               <tbody>

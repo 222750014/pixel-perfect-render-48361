@@ -21,7 +21,7 @@ export interface Insights {
   interpretation: string;
 }
 
-/** Cleans, scores with VADER and stores an analysis. */
+/** Cleans, classifies with the Hugging Face model and stores an analysis. */
 export const createAnalysis = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
@@ -35,7 +35,11 @@ export const createAnalysis = createServerFn({ method: "POST" })
     const { publicDb } = await import("./db.server");
     const { comments, removedEmpty, removedDuplicates } = cleanComments(data.comments);
     if (!comments.length) return { error: "No usable comments after cleaning (all were empty)." as string, id: null };
-    const scored = comments.map(scoreComment);
+    const { classifyTexts, HFError } = await import("./hf.server");
+    let probs;
+    try { probs = await classifyTexts(comments.map((c) => c.text)); }
+    catch (e) { console.error(e); return { error: e instanceof HFError ? e.message : "Sentiment analysis failed.", id: null }; }
+    const scored = comments.map((c, i) => scoreComment(c, probs[i]!));
     const stats = computeStats(scored, removedEmpty, removedDuplicates);
     const db = publicDb();
     const { data: row, error } = await db
@@ -114,7 +118,7 @@ async function loadContext(id: string) {
 function statsBlock(a: { title: string; source: string; source_ref: string | null }, s: AnalysisStats) {
   return `Dataset: "${a.title}" (source: ${a.source}${a.source_ref ? `, ${a.source_ref}` : ""})
 Total comments: ${s.total} | Positive: ${s.positive} (${pct(s.positive, s.total)}%) | Neutral: ${s.neutral} (${pct(s.neutral, s.total)}%) | Negative: ${s.negative} (${pct(s.negative, s.total)}%)
-Average VADER compound: ${s.avgCompound}
+Average sentiment score (P(pos)−P(neg), Hugging Face): ${s.avgCompound}
 Emojis: ${s.emojiTotal} total, ${s.emojiUnique} unique. Top: ${s.topEmojis.map((e) => `${e.emoji}×${e.count} (avg ${e.avgCompound})`).join(", ") || "none"}
 Top keywords: ${s.keywords.map((k) => `${k.word}(${k.count})`).join(", ")}`;
 }
@@ -122,7 +126,7 @@ Top keywords: ${s.keywords.map((k) => `${k.word}(${k.count})`).join(", ")}`;
 const fmt = (rows: { text: string; compound: number }[]) =>
   rows.map((r) => `- [${r.compound.toFixed(3)}] ${r.text.slice(0, 280)}`).join("\n");
 
-/** AI-assisted interpretation grounded in calculated VADER statistics. */
+/** AI-assisted interpretation grounded in calculated model statistics. */
 export const generateInsights = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
@@ -131,7 +135,7 @@ export const generateInsights = createServerFn({ method: "POST" })
       const { db, a, top, bottom, sample } = await loadContext(data.id);
       const s = a.stats as unknown as AnalysisStats;
       const text = await runAI(
-        `You are a data analyst. Interpret real audience comments. The VADER numbers are ground truth; never contradict or invent statistics. Also act as an emotion classifier (like a Hugging Face emotion model with labels joy, love, surprise, anger, sadness, fear, neutral): estimate emotion shares from the sample. Respond with ONLY a JSON object with keys: overall (2-3 sentences), dominantEmotion (string), emotions (array of {emotion, share} where share is a percentage, sums to 100), emojiInterpretation (2 sentences on what the emojis signal), positiveThemes (3-5 short strings), negativeThemes (3-5 short strings), concerns (2-4 strings), improvements (2-4 strings), interpretation (one paragraph).`,
+        `You are a data analyst. Interpret real audience comments. The Hugging Face model numbers are ground truth; never contradict or invent statistics. Also act as an emotion classifier (like a Hugging Face emotion model with labels joy, love, surprise, anger, sadness, fear, neutral): estimate emotion shares from the sample. Respond with ONLY a JSON object with keys: overall (2-3 sentences), dominantEmotion (string), emotions (array of {emotion, share} where share is a percentage, sums to 100), emojiInterpretation (2 sentences on what the emojis signal), positiveThemes (3-5 short strings), negativeThemes (3-5 short strings), concerns (2-4 strings), improvements (2-4 strings), interpretation (one paragraph).`,
         [{ role: "user", content: `${statsBlock(a, s)}\n\nMost positive comments:\n${fmt(top)}\n\nMost negative comments:\n${fmt(bottom)}\n\nSample for emotion estimation:\n${fmt(sample)}` }],
       );
       const insights = parseJsonLoose<Insights>(text);
@@ -154,7 +158,7 @@ export const askChat = createServerFn({ method: "POST" })
       const { data: history } = await db.from("chat_messages").select("role,content").eq("analysis_id", data.id).order("created_at").limit(20);
       await db.from("chat_messages").insert({ analysis_id: data.id, role: "user", content: data.message });
       const reply = await runAI(
-        `You are a helpful data-analysis assistant inside a student's Sentiment Analysis Tool. Answer ONLY from the dataset context below. Use the exact calculated numbers. If something cannot be answered from the data, say so. VADER compound ranges -1 to 1; >=0.05 Positive, <=-0.05 Negative, otherwise Neutral. Keep answers concise and use markdown lists when helpful.\n\n${statsBlock(a, s)}\n\nAI insights (if generated): ${a.insights ? JSON.stringify(a.insights) : "none yet"}\n\nMost positive comments:\n${fmt(top)}\n\nMost negative comments:\n${fmt(bottom)}\n\nRandom sample:\n${fmt(sample.slice(0, 80))}`,
+        `You are a helpful data-analysis assistant inside a student's Sentiment Analysis Tool. Answer ONLY from the dataset context below. Use the exact calculated numbers. If something cannot be answered from the data, say so. Labels come from a Hugging Face RoBERTa model (positive/neutral/negative); the score is P(positive) minus P(negative), from -1 to 1. Keep answers concise and use markdown lists when helpful.\n\n${statsBlock(a, s)}\n\nAI insights (if generated): ${a.insights ? JSON.stringify(a.insights) : "none yet"}\n\nMost positive comments:\n${fmt(top)}\n\nMost negative comments:\n${fmt(bottom)}\n\nRandom sample:\n${fmt(sample.slice(0, 80))}`,
         [
           ...(history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
           { role: "user" as const, content: data.message },
