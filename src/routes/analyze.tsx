@@ -55,7 +55,8 @@ function AnalyzePage() {
       toast.success("Analysis complete");
       navigate({ to: "/analysis/$id", params: { id: res.id } });
     } catch (e) {
-      console.error(e); setError("Network error. Please try again.");
+      console.error(e);
+      setError(e instanceof Error && e.message && !/fetch|network/i.test(e.message) ? `Analysis failed: ${e.message}` : "Network error. Please try again.");
     } finally { setBusy(false); }
   }
 
