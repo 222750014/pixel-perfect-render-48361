@@ -1,5 +1,5 @@
 // Shared, pure analysis helpers (safe on client and server).
-// Sentiment comes from the Hugging Face model (see hf.server.ts); emojis are only counted, never scored.
+// Sentiment comes from the AI sentiment model (see classify.server.ts); emojis are only counted, never scored.
 
 export type SentimentLabel = "Positive" | "Neutral" | "Negative";
 export type SourceType = "youtube" | "csv" | "manual";
