@@ -47,7 +47,7 @@ export const Route = createFileRoute("/analysis/$id")({
           { name: "twitter:card", content: "summary_large_image" },
           { name: "description", content: `Sentiment analysis results for ${loaderData.title}.` },
           { property: "og:title", content: `${loaderData.title} — Sentiment Lab` },
-          { property: "og:description", content: "Hugging Face sentiment, emoji and AI insights for real audience comments." },
+          { property: "og:description", content: "AI sentiment, emoji and insights for real audience comments." },
         ]
       : [{ title: "Analysis not found" }, { name: "robots", content: "noindex" }],
   }),
@@ -190,7 +190,7 @@ function AnalysisPage() {
             </table>
           </Panel>
           <Panel title="Emotion distribution (AI-assisted)" className="lg:col-span-2">
-            <p className="mb-3 text-xs text-muted-foreground">The Hugging Face model provides the sentiment classification. The emotion estimate below is an additional AI interpretation (Hugging Face-style emotion labels) and should be checked against the calculated statistics.</p>
+            <p className="mb-3 text-xs text-muted-foreground">The AI sentiment model provides the sentiment classification. The emotion estimate below is an additional AI interpretation and should be checked against the calculated statistics.</p>
             {insights?.emotions?.length ? (
               <div className="grid gap-4 md:grid-cols-2">
                 <ResponsiveContainer width="100%" height={240}>
