@@ -229,8 +229,8 @@ function AnalysisPage() {
 
 function Stat({ label, value, sub, tone }: { label: string; value: string | number; sub?: string | undefined; tone?: string }) {
   return (
-    <div className="rounded-lg border bg-card p-4">
-      <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{tone && <span className={`h-2 w-2 rounded-full ${tone}`} />}{label}</div>
+    <div className="surface-card p-4">
+      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">{tone && <span className={`h-2 w-2 rounded-full ${tone}`} />}{label}</div>
       <div className="mt-1 truncate text-2xl font-semibold capitalize">{value}</div>
       {sub && <div className="font-mono text-xs text-muted-foreground">{sub}</div>}
     </div>
@@ -239,7 +239,7 @@ function Stat({ label, value, sub, tone }: { label: string; value: string | numb
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`border-t py-5 ${className}`}>
+    <section className={`surface-card p-5 ${className}`}>
       <h3 className="mb-4 text-sm font-semibold text-foreground">{title}</h3>
       {children}
     </section>
